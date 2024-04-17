@@ -12,8 +12,8 @@ class TransformerClassifierModel(BaseModel):
 
         self.classifier = pipeline("zero-shot-classification", model=model)
 
-    def model_type(self):
-        return "classifier"
+    def model_description(self):
+        return {"type": "classifier", "scores": True}
 
     def complete(
         self,

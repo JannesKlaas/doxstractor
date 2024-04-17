@@ -1,6 +1,6 @@
 import anthropic
 from .base import BaseModel
-from typing import Optional
+from typing import Optional, List
 import time
 
 
@@ -17,6 +17,27 @@ class AnthropicAPIModel(BaseModel):
 
     def model_type(self):
         return "text"
+
+    def _query_anthropic(self, system_prompt, user_prompt):
+        message = self.client.messages.create(
+            model=self.model,
+            max_tokens=self.max_tokens,
+            temperature=self.temperature,
+            system=system_prompt,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": user_prompt,
+                        }
+                    ],
+                }
+            ],
+        )
+
+        return message
 
     def complete(
         self,
@@ -53,23 +74,20 @@ class AnthropicAPIModel(BaseModel):
 
         return message.content[0].text
 
-    def _query_anthropic(self, system_prompt, user_prompt):
-        message = self.client.messages.create(
-            model=self.model,
-            max_tokens=self.max_tokens,
-            temperature=self.temperature,
-            system=system_prompt,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": user_prompt,
-                        }
-                    ],
-                }
-            ],
-        )
-
-        return message
+    def batch_complete(
+        self,
+        query: str,
+        context: List[str],
+        task_description: Optional[str] = None,
+        system_prompt: Optional[str] = None,
+    ) -> List[str]:
+        all_results = []
+        for c in context:
+            result = self.complete(
+                query=query,
+                context=c,
+                task_description=task_description,
+                system_prompt=system_prompt,
+            )
+            all_results.append(result)
+        return all_results

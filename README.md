@@ -1,6 +1,6 @@
-# Doxtractor 📄➡️📊 
+# Doxstractor 📄➡️📊 
 
-Doxtractor is a modular library to extract structured data from documents using LLMs.
+Doxstractor is a modular library to extract structured data from documents using LLMs.
 
 There are many situations where you want to extract data such as numbers, text or categories from a bunch of documents. Doxstractor was created with M&A due dilligence in mind. When a company is sold, the prospective buyer will recieve a data room with everything from key employment contracts to real estate leases. 
 

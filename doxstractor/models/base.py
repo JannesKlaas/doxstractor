@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List, Dict
 
 
 class BaseModel:
@@ -21,5 +21,23 @@ class BaseModel:
     ):
         raise NotImplementedError
 
-    def model_type(self):
-        return "base"
+    def model_description(self):
+        raise NotImplementedError
+
+    def batch_complete(
+        self,
+        query: str,
+        context: List[str],
+        task_description: Optional[str] = None,
+        system_prompt: Optional[str] = None,
+    ) -> List[str]:
+        raise NotImplementedError
+
+    def batch_complete_with_scores(
+        self,
+        query: str,
+        context: List[str],
+        task_description: Optional[str] = None,
+        system_prompt: Optional[str] = None,
+    ) -> List[Dict]:
+        raise NotImplementedError

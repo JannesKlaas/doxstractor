@@ -10,6 +10,7 @@ from .models import (
     BaseModel,
     AnthropicAPIModel,
     MockModel,
+    MockModelWithScores,
     TransformersQAModel,
     TransformerClassifierModel,
 )

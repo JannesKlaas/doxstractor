@@ -3,6 +3,10 @@ from ..models import BaseModel
 from .base import BaseExtractor
 from typing import List, Optional
 import re
+import numpy as np
+
+# TODO: Need to find a way to pull the task description which depends on the categories up here
+SYSTEM_PROMPT = 'Your job is to provide a categorial answer based on provided text. Answer only with the category, and no other text. If there is no relevant information in the text provided, respond with "NA". Do not make things up.'
 
 
 class CategoryExtractor(BaseExtractor):
@@ -25,35 +29,49 @@ class CategoryExtractor(BaseExtractor):
         self.categories = categories
 
     def extract(self, doc_text: str) -> str:
+
         merged_chunks = self._chunk_text(doc_text)
         categories_str = "The possible categories are " + ", ".join(
             [f'"{w}"' for w in self.categories]
         )
-        snip_messages = []
+        TASK_DESCRIPTION = (
+            f"Valid categories are: {categories_str} \n Use the information below:"
+        )
 
         # Classifier models don't have actual queries, you just provide the possible categories.
-        if self.model.model_type() == "classifier":
+        if self.model.model_description()["type"] == "classifier":
             query = self.categories
         else:
             query = self.query
 
-        for snippet in merged_chunks:
-
-            message = self.model.complete(
+        if self.model.model_description()["scores"]:
+            results_with_scores = self.model.batch_complete_with_scores(
                 query=query,
-                context=snippet,
-                task_description=f"Valid categories are: {categories_str} \n Use the information below:",
-                system_prompt='Your job is to provide a categorial answer based on provided text. Answer only with the category, and no other text. If there is no relevant information in the text provided, respond with "NA". Do not make things up.',
+                context=merged_chunks,
+                task_description=TASK_DESCRIPTION,
+                system_prompt=SYSTEM_PROMPT,
             )
-            snip_messages.append(message)
-
-        valid_answers = [
-            m for m in snip_messages if (m != "NA") and (m in self.categories)
-        ]
-
-        if len(valid_answers) > 0:
-            consensus = most_common(valid_answers)
+            filtered = [
+                r for r in results_with_scores if (r["answer"] in self.categories)
+            ]
+            all_scores = [r["score"] for r in filtered]
+            idx = np.argmax(all_scores)
+            consensus = results_with_scores[idx]["answer"]
+            return consensus
         else:
-            consensus = "NA"
+            results = self.model.batch_complete(
+                query=query,
+                context=merged_chunks,
+                task_description=TASK_DESCRIPTION,
+                system_prompt=SYSTEM_PROMPT,
+            )
+            valid_answers = [
+                m for m in results if (m != "NA") and (m in self.categories)
+            ]
 
-        return consensus
+            if len(valid_answers) > 0:
+                consensus = most_common(valid_answers)
+            else:
+                consensus = "NA"
+
+            return consensus

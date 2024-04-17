@@ -1,10 +1,7 @@
 import doxstractor as dxc
 
 
-def test_graph_creation():
-    lease_doc = "lease"
-    employment_doc = "employment"
-    model = dxc.MockModel()
+def create_graph(model):
     root_extractor = dxc.CategoryExtractor(
         name="doc_type",
         query="What type of document is this?",
@@ -25,6 +22,35 @@ def test_graph_creation():
     }
 
     root_node = dxc.Node(root_extractor, children=children)
+    return root_node
+
+
+def test_graph_creation():
+    lease_doc = "lease"
+    employment_doc = "employment"
+    model = dxc.MockModel()
+
+    root_node = create_graph(model)
+
+    expected_lease_result = {"doc_type": "lease", "text_lease": "lease"}
+    expected_employment_result = {
+        "doc_type": "employment",
+        "text_employment": "employment",
+    }
+
+    lease_result = root_node.extract(lease_doc)
+    employment_result = root_node.extract(employment_doc)
+
+    assert lease_result == expected_lease_result
+    assert employment_result == expected_employment_result
+
+
+def test_graph_creation_with_scores():
+    lease_doc = "lease"
+    employment_doc = "employment"
+    model = dxc.MockModelWithScores()
+
+    root_node = create_graph(model)
 
     expected_lease_result = {"doc_type": "lease", "text_lease": "lease"}
     expected_employment_result = {
