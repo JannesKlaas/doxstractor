@@ -1,8 +1,5 @@
-from ..utils import parseNumber, most_common
-from ..models import BaseModel
+from ..utils import most_common
 from .base import BaseExtractor
-from typing import List, Optional
-import re
 import numpy as np
 
 TASK_DESCRIPTION = "Use the information given below."
@@ -13,6 +10,14 @@ SYSTEM_PROMPT = 'Answer only with the relevant text snippet you have found below
 class TextExtractor(BaseExtractor):
 
     def extract(self, doc_text: str) -> str:
+        """Extracts a text snippet.
+
+        Args:
+            doc_text (str): The document text from which to extract.
+
+        Returns:
+            str: The extracted snippet.
+        """
         merged_chunks = self._chunk_text(doc_text)
 
         if self.model.model_description()["scores"]:

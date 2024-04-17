@@ -9,15 +9,30 @@ class BaseExtractor:
         query: str,
         model: BaseModel,
         max_chunk_size: float = 10_000,
-        first_chunk_only: bool = False,
     ) -> None:
+        """Create a new extractor
+
+        Args:
+            name (str): A unique name. This identifies the extractor within a graph and provides the attribute name.
+            model (BaseModel): The natural language model which is used to extract text.
+            max_chunk_size (float, optional): Maximum size to chunk data into.. Defaults to 10_000.
+        """
+        # TODO: This maybe should be a model attribute.
         self.max_chunk_size = max_chunk_size
         self.model = model
         self.query = query
         self.name = name
-        self.first_chunk_only = first_chunk_only
 
     def _chunk_text(self, doc_text: str) -> List[str]:
+        """Splits a document by newlines. Then generates chunks which are shorter than
+        max_chunk_size.
+
+        Args:
+            doc_text (str): The full document to chunk.
+
+        Returns:
+            List[str]: A list of chunks
+        """
         chunks = doc_text.split("\n")
 
         merged_chunks = [""]
@@ -27,11 +42,6 @@ class BaseExtractor:
                 merged_chunks[-1] = prev_chunk + "\n" + chunk
             else:
                 merged_chunks.append(chunk)
-
-        # In some cases it can be useful to only provide the opening of the document
-        # E.g. when classifying the document
-        if self.first_chunk_only:
-            return [merged_chunks[0]]
 
         return merged_chunks
 

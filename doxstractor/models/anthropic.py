@@ -11,6 +11,13 @@ class AnthropicAPIModel(BaseModel):
         temperature: float = 0.0,
         max_tokens: int = 1_000,
     ) -> None:
+        """Model using the Anthropic python API
+
+        Args:
+            model (Optional[str], optional): Model name. Defaults to "claude-3-haiku-20240307".
+            temperature (float, optional): Defaults to 0.0.
+            max_tokens (int, optional):Defaults to 1_000.
+        """
         super().__init__(model=model, temperature=temperature, max_tokens=max_tokens)
 
         self.client = anthropic.Anthropic()
@@ -45,7 +52,18 @@ class AnthropicAPIModel(BaseModel):
         context: str,
         task_description: Optional[str] = None,
         system_prompt: Optional[str] = None,
-    ):
+    ) -> str:
+        """Sends a request to Anthropic and returns the result. Deals with API issues such as overload, timout, etc.
+
+        Args:
+            query (str): The query specifying what we want to extract.
+            context (str): The text from which to extract.
+            task_description (Optional[str], optional): Inserted between the query and the context. Defaults to None.
+            system_prompt (Optional[str], optional): System prompt for model. Defaults to None.
+
+        Returns:
+            str: Model response text.
+        """
         if task_description:
             user_prompt = query + "\n" + task_description + "\n" + context
         else:
@@ -81,6 +99,17 @@ class AnthropicAPIModel(BaseModel):
         task_description: Optional[str] = None,
         system_prompt: Optional[str] = None,
     ) -> List[str]:
+        """Sends batch of requests to Anthropic and returns the result. Deals with API issues such as overload, timout, etc.
+
+        Args:
+            query (str): The query specifying what we want to extract.
+            context (List[str]): The text from which to extract. Model will answer query for each element of list.
+            task_description (Optional[str], optional): Inserted between the query and the context. Defaults to None.
+            system_prompt (Optional[str], optional): System prompt for model. Defaults to None.
+
+        Returns:
+            List[str]: Model response text for each context.
+        """
         all_results = []
         for c in context:
             result = self.complete(

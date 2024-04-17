@@ -1,7 +1,7 @@
-from ..utils import parseNumber, most_common
-from ..models import BaseModel
+from ..utils import most_common
+
 from .base import BaseExtractor
-from typing import List, Optional
+
 import re
 import numpy as np
 
@@ -18,6 +18,14 @@ class NumericExtractor(BaseExtractor):
         return num
 
     def extract(self, doc_text: str) -> float:
+        """Extracts a number from a document.
+
+        Args:
+            doc_text (str): The document text from which to extract.
+
+        Returns:
+            float: The extracted number.
+        """
 
         merged_chunks = self._chunk_text(doc_text)
 

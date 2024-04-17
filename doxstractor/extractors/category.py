@@ -1,11 +1,14 @@
 from ..utils import most_common
 from ..models import BaseModel
 from .base import BaseExtractor
-from typing import List, Optional
-import re
+from typing import List
+
 import numpy as np
 
-# TODO: Need to find a way to pull the task description which depends on the categories up here
+
+TASK_DESCRIPTION = (
+    "Valid categories are: {categories_str} \n Use the information below:"
+)
 SYSTEM_PROMPT = 'Your job is to provide a categorial answer based on provided text. Answer only with the category, and no other text. If there is no relevant information in the text provided, respond with "NA". Do not make things up.'
 
 
@@ -17,25 +20,36 @@ class CategoryExtractor(BaseExtractor):
         categories: List[str],
         model: BaseModel,
         max_chunk_size: float = 10_000,
-        first_chunk_only: bool = False,
     ) -> None:
+        """Create a new extractor
+
+        Args:
+            name (str): A unique name. This identifies the extractor within a graph and provides the attribute name.
+            categories (list): Allowed categories.
+            model (BaseModel): The natural language model which is used to extract text.
+            max_chunk_size (float, optional): Maximum size to chunk data into.. Defaults to 10_000.
+        """
         super().__init__(
             name=name,
             query=query,
             max_chunk_size=max_chunk_size,
             model=model,
-            first_chunk_only=first_chunk_only,
         )
         self.categories = categories
 
     def extract(self, doc_text: str) -> str:
+        """Extracts a category from a document, similar to zero shot classification.
+
+        Args:
+            doc_text (str): The document from which to extract
+
+        Returns:
+            str: The extracted category. Guaranteed to be one of the categories provided on init or 'NA'
+        """
 
         merged_chunks = self._chunk_text(doc_text)
         categories_str = "The possible categories are " + ", ".join(
             [f'"{w}"' for w in self.categories]
-        )
-        TASK_DESCRIPTION = (
-            f"Valid categories are: {categories_str} \n Use the information below:"
         )
 
         # Classifier models don't have actual queries, you just provide the possible categories.
@@ -48,7 +62,7 @@ class CategoryExtractor(BaseExtractor):
             results_with_scores = self.model.batch_complete_with_scores(
                 query=query,
                 context=merged_chunks,
-                task_description=TASK_DESCRIPTION,
+                task_description=TASK_DESCRIPTION.format(categories_str=categories_str),
                 system_prompt=SYSTEM_PROMPT,
             )
             filtered = [
@@ -62,7 +76,7 @@ class CategoryExtractor(BaseExtractor):
             results = self.model.batch_complete(
                 query=query,
                 context=merged_chunks,
-                task_description=TASK_DESCRIPTION,
+                task_description=TASK_DESCRIPTION.format(categories_str=categories_str),
                 system_prompt=SYSTEM_PROMPT,
             )
             valid_answers = [

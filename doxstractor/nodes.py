@@ -3,13 +3,34 @@ from .extractors import BaseExtractor, CategoryExtractor
 from typing import Dict, Optional, List
 import collections
 
+"""
+A node is an element of a tree which has one or multiple children. Depending on the results of the extractor,
+it recursively calls all the child nodes corresponding to the result.
+
+E.g. if you have a `CategoryExtractor` with the categories `rental_contract` and `employment_contract`, you likely
+want to extract different attributes depending on what you are dealing with.
+
+So you would provide a children dictionary as below:
+```python
+{
+    "rental_contract": [
+        LeaseDatesExtractor,
+        SizeExtractor,
+    ],
+    "employment_contract": [
+        SalaryExtractor,
+        StockOptionsExtractor
+    ]
+}
+```
+"""
+
 
 class Node:
     def __init__(
         self, extractor: BaseExtractor, children: Optional[Dict[str, List[Node]]] = None
     ) -> None:
-        """
-        A node is an element of a tree which has one or multiple children. Depending on the results of the extractor,
+        """A node is an element of a tree which has one or multiple children. Depending on the results of the extractor,
         it recursively calls all the child nodes corresponding to the result.
 
         E.g. if you have a `CategoryExtractor` with the categories `rental_contract` and `employment_contract`, you likely
@@ -28,6 +49,11 @@ class Node:
             ]
         }
         ```
+
+        Args:
+            extractor (BaseExtractor): The extractor at the root of the node.
+            children (Optional[Dict[str, List[Node]]], optional): Dictionary where key is a category of the
+                root node and value is a list of nodes. Defaults to None.
         """
 
         self.extractor = extractor
@@ -35,7 +61,7 @@ class Node:
         self.validate()
 
     def validate(self):
-
+        """Ensures the node is valid."""
         if self.children:
             # Ensure only a category extractor gets children
             if not (isinstance(self.extractor, CategoryExtractor)):
@@ -58,6 +84,14 @@ class Node:
                 )
 
     def extract(self, doc_text: str) -> Dict:
+        """Recursively runs all extractors
+
+        Args:
+            doc_text (str): Document text from which to extract.
+
+        Returns:
+            Dict: {node_name: node_result}
+        """
 
         # Run Extraction on own extractor
         result = self.extractor.extract(doc_text)

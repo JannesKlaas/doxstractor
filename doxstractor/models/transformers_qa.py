@@ -2,7 +2,6 @@ from .base import BaseModel
 from transformers import pipeline
 from typing import Optional, List, Dict
 import torch
-import numpy as np
 
 
 class TransformersQAModel(BaseModel):
@@ -31,8 +30,18 @@ class TransformersQAModel(BaseModel):
         context: str,
         task_description: Optional[str] = None,
         system_prompt: Optional[str] = None,
-    ):
+    ) -> str:
+        """Extracts a snippet of text to answer the query.
 
+        Args:
+            query (str): The query specifying what we want to extract.
+            context (List[str]): The text from which to extract.
+            task_description (Optional[str], optional): Not used, only for compatibility. Defaults to None.
+            system_prompt (Optional[str], optional): Not used, only for compatibility. Defaults to None.
+
+        Returns:
+            str: The extracted response.
+        """
         input = {"question": query, "context": context}
         res = self.pipeline(input)
 
@@ -48,6 +57,18 @@ class TransformersQAModel(BaseModel):
         task_description: Optional[str] = None,
         system_prompt: Optional[str] = None,
     ) -> List[Dict]:
+        """Extracts a snippet of text to answer the query for each context provided.
+        Returns a dictionary including answers and confidence scores.
+
+        Args:
+            query (str): The query specifying what we want to extract.
+            context (List[str]): The text from which to extract. Model will answer query for each element of list.
+            task_description (Optional[str], optional): Not used, only for compatibility. Defaults to None.
+            system_prompt (Optional[str], optional): Not used, only for compatibility. Defaults to None.
+
+        Returns:
+            List[Dict]: A list of dictionaries like {'score':confidence_score, 'answer':answer_text}
+        """
         all_inputs = []
         for c in context:
             all_inputs.append({"question": query, "context": c})
