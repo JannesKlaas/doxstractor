@@ -50,7 +50,7 @@ class TransformersQAModel(BaseModel):
     ) -> List[Dict]:
         all_inputs = []
         for c in context:
-            all_inputs.append({{"question": query, "context": c}})
+            all_inputs.append({"question": query, "context": c})
 
         all_results = self.pipeline(all_inputs)
         return all_results

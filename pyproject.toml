@@ -6,13 +6,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "doxstractor"
-version = "0.0.7"
+version = "0.0.10"
 authors = [{ name = "Jannes Klaas" }]
 
 description = "Doxstractor extracts strutured data from text in an easily configurable way."
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["anthropic==0.25.1", "transformers[torch]==4.39.3"]
+dependencies = ["anthropic==0.25.1", "transformers==4.39.3"]
 license = { text = "Apache Software License (Apache 2.0)" }
 classifiers = [
     "Programming Language :: Python :: 3",

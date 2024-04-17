@@ -61,6 +61,9 @@ From here, we can extract an address from a given text:
 ```python
 address = address_extractor.extract(text)
 ```
+```
+[Out]: 6335 1St – Avenue South, Seattle, Washington.
+```
 
 To get our salary extractor for the employment contracts we do almost the same:
 ```python
@@ -69,6 +72,9 @@ salary_extractor = dxc.NumericExtractor(
     query="What is the base salary?", 
     model=model, 
 )
+```
+```
+[Out]: 575,000
 ```
 
 We can use the same model as for the addresses, the extractor will ensure that the response is numeric.
@@ -104,3 +110,33 @@ Extraction with a chain works just the same as it does with a single extractor.
 ```python
 chain.extract(text)
 ```
+
+```
+[Out]: {'doctype': 'employment', 'salary': '575,000'}
+```
+
+```python
+path = "tutorial_data/"
+file_paths = glob.glob(os.path.join(path, '*'))
+
+collector = []
+for fp in file_paths:
+    with open(fp, "r") as f:
+        html = f.read()
+    soup = BeautifulSoup(html, features="html.parser")
+    text = soup.get_text()
+    data = chain.extract(text)
+    data.update({"file_path":fp})
+    collector.append(data)
+
+pd.DataFrame(collector)[["file_path", "doctype", "salary", "address"]].sort_values("doctype")
+```
+
+|index|file\_path|doctype|salary|address|
+|---|---|---|---|---|
+|2|tutorial\_data/EDGAR\_employment\_agreement\_3\.html|employment||NaN|
+|3|tutorial\_data/EDGAR\_employment\_agreement\_2\.html|employment|350,000|NaN|
+|4|tutorial\_data/EDGAR\_employment\_agreement\_1\.html|employment|575,000|NaN|
+|0|tutorial\_data/EDGAR\_lease\_agreement\_2\.html|lease|NaN|
+3850 Annapolis Lane,|
+|1|tutorial\_data/EDGAR\_lease\_agreement\_1\.html|lease|NaN| 6335 1St – Avenue South, Seattle, Washington\.|

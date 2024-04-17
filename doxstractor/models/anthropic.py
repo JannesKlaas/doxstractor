@@ -15,8 +15,8 @@ class AnthropicAPIModel(BaseModel):
 
         self.client = anthropic.Anthropic()
 
-    def model_type(self):
-        return "text"
+    def model_description(self):
+        return {"type": "text", "scores": False}
 
     def _query_anthropic(self, system_prompt, user_prompt):
         message = self.client.messages.create(
