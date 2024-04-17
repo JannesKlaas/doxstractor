@@ -3,28 +3,6 @@ from .extractors import BaseExtractor, CategoryExtractor
 from typing import Dict, Optional, List
 import collections
 
-"""
-A node is an element of a tree which has one or multiple children. Depending on the results of the extractor,
-it recursively calls all the child nodes corresponding to the result.
-
-E.g. if you have a `CategoryExtractor` with the categories `rental_contract` and `employment_contract`, you likely
-want to extract different attributes depending on what you are dealing with.
-
-So you would provide a children dictionary as below:
-```python
-{
-    "rental_contract": [
-        LeaseDatesExtractor,
-        SizeExtractor,
-    ],
-    "employment_contract": [
-        SalaryExtractor,
-        StockOptionsExtractor
-    ]
-}
-```
-"""
-
 
 class Node:
     def __init__(
