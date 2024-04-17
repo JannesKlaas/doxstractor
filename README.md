@@ -115,6 +115,10 @@ chain.extract(text)
 [Out]: {'doctype': 'employment', 'salary': '575,000'}
 ```
 
+
+### Extracting data from folders
+
+To extract data from folders, you simply loop over the files and apply your chain to all documents.
 ```python
 path = "tutorial_data/"
 file_paths = glob.glob(os.path.join(path, '*'))
@@ -140,3 +144,5 @@ pd.DataFrame(collector)[["file_path", "doctype", "salary", "address"]].sort_valu
 |0|tutorial\_data/EDGAR\_lease\_agreement\_2\.html|lease|NaN|
 3850 Annapolis Lane,|
 |1|tutorial\_data/EDGAR\_lease\_agreement\_1\.html|lease|NaN| 6335 1St – Avenue South, Seattle, Washington\.|
+
+The table above is correct (I checked the documents), except that it omitted one salary which is actually specified in the document. A better model can fix this.
