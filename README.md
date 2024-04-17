@@ -141,8 +141,7 @@ pd.DataFrame(collector)[["file_path", "doctype", "salary", "address"]].sort_valu
 |2|tutorial\_data/EDGAR\_employment\_agreement\_3\.html|employment||NaN|
 |3|tutorial\_data/EDGAR\_employment\_agreement\_2\.html|employment|350,000|NaN|
 |4|tutorial\_data/EDGAR\_employment\_agreement\_1\.html|employment|575,000|NaN|
-|0|tutorial\_data/EDGAR\_lease\_agreement\_2\.html|lease|NaN|
-3850 Annapolis Lane,|
+|0|tutorial\_data/EDGAR\_lease\_agreement\_2\.html|lease|NaN| 3850 Annapolis Lane,|
 |1|tutorial\_data/EDGAR\_lease\_agreement\_1\.html|lease|NaN| 6335 1St – Avenue South, Seattle, Washington\.|
 
 The table above is correct (I checked the documents), except that it omitted one salary which is actually specified in the document. A better model can fix this.
