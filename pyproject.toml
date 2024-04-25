@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "doxstractor"
-version = "0.1.0"
+version = "0.1.1"
 authors = [{ name = "Jannes Klaas" }]
 
 description = "Doxstractor extracts strutured data from text in an easily configurable way."

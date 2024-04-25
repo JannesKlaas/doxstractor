@@ -13,4 +13,5 @@ from .models import (
     MockModelWithScores,
     TransformersQAModel,
     TransformerClassifierModel,
+    HFEndPointQAModel,
 )
